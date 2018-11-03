@@ -7,6 +7,7 @@ Created on Fri Nov  2 14:36:37 2018
 
 import pandas
 from sklearn import model_selection, linear_model
+from sklearn.metrics import roc_curve, auc
 import numpy
 import seaborn 
 import matplotlib.pyplot as plt
@@ -33,6 +34,10 @@ def modeler(inp):
     testAccuracy = testDif.sum()/test.shape[0]
     testPrecision = (testPredRound == test["Survived"]).sum()/testPredRound.sum()
     testRecall = (testPredRound == test["Survived"]).sum()/test["Survived"].sum()
+     
+    # Compute ROC curve and ROC area for each class
+    fpr, tpr, _ = roc_curve(test["Survived"],testPrediction[:,1])
+    roc_auc = auc(fpr, tpr)
     
     ##Do a grid run with the model
     xmin = int(numpy.floor(inpD["SeptBees"].min()))
@@ -53,6 +58,21 @@ def modeler(inp):
     plt.ylabel("Frames of Bees")
     plt.tight_layout()
     plt.savefig("heatmap.png")
+    plt.show()
+    
+    ##Plot ROC curve
+    plt.figure()
+    lw=2
+    plt.plot(fpr, tpr, color='darkorange',
+             lw=lw, label='ROC curve (area = %0.2f)' % roc_auc)
+    plt.plot([  0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver operating characteristic')
+    plt.legend(loc="lower right")
+    plt.savefig("ROC_curve.png")
     plt.show()
     
     return(model,testAccuracy, testPrecision, testRecall)
