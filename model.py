@@ -26,8 +26,12 @@ def modeler(inp):
     inpD["Survived"] = (inpD["JanuaryBees"] >= survivalshipThreshold).astype(int)
     train, test = model_selection.train_test_split(inpD, random_state = randomSeed)
     
-    ##Predict outcomes
-    model = linear_model.LogisticRegression(random_state=randomSeed).fit(train[["SeptBees","SeptMites"]],train["Survived"])
+    ##Train models
+    model = linear_model.LogisticRegression(random_state=randomSeed, fit_intercept=False).fit(train[["SeptBees","SeptMites"]],train["Survived"])
+    #coefficients are the log values of the ORs
+    oddsRatio = numpy.exp(model.coef_)/(1+numpy.exp(model.coef_))
+    
+    #Test model
     testPrediction = model.predict_proba(test[["SeptBees","SeptMites"]])
     testPredRound = (testPrediction[:,1] > probabilityThreshold)
     testDif = testPredRound == test["Survived"]
@@ -61,6 +65,7 @@ def modeler(inp):
     plt.show()
     
     ##Plot ROC curve
+    #http://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html
     plt.figure()
     lw=2
     plt.plot(fpr, tpr, color='darkorange',
@@ -75,6 +80,7 @@ def modeler(inp):
     plt.savefig("ROC_curve.png")
     plt.show()
     
-    return(model,testAccuracy, testPrecision, testRecall)
+    return model,testAccuracy, testPrecision, testRecall, oddsRatio
 
-model, testAccuracy, testPrecision, testRecall = modeler(inpF)
+model, testAccuracy, testPrecision, testRecall, oddsRatio = modeler(inpF)
+print(f"Performance with .5 probability threshold\n------------------\nTest Accuracy:{testAccuracy}\nTest Precision:{testPrecision}\nTest Recall:{testRecall}\n\nOdds Ratio\n------------------\nFramesOfBees\tMites\n{oddsRatio}")
