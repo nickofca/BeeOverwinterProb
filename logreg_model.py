@@ -83,4 +83,3 @@ def modeler(inp):
     return model,testAccuracy, testPrecision, testRecall, oddsRatio
 
 model, testAccuracy, testPrecision, testRecall, oddsRatio = modeler(inpF)
-print(f"Performance with .5 probability threshold\n------------------\nTest Accuracy:{testAccuracy}\nTest Precision:{testPrecision}\nTest Recall:{testRecall}\n\nOdds Ratio\n------------------\nFramesOfBees\tMites\n{oddsRatio}")
