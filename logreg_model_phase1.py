@@ -6,8 +6,6 @@ Created on Fri Nov  2 14:36:37 2018
 """
 
 import pandas
-from sklearn import model_selection, linear_model
-from sklearn.metrics import roc_curve, auc
 import numpy
 import seaborn 
 import matplotlib.pyplot as plt
