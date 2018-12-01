@@ -9,6 +9,8 @@ import pandas
 import numpy
 import seaborn 
 import matplotlib.pyplot as plt
+from sklearn import linear_model
+import statsmodels.api as sm
 
 inputFile = inpF = "data/Nick file.txt"
 
@@ -22,11 +24,15 @@ def modeler(inp):
     inputData = inpD = pandas.read_csv(inp, sep='\t', header = 0)
     inpD.columns = ["SeptBees","SeptMites","JanuaryBees"]
     inpD["Survived"] = (inpD["JanuaryBees"] >= survivalshipThreshold).astype(int)
+    x = inpD[["SeptBees","SeptMites"]]
+    y = inpD["Survived"]
     
-    ##Train models
-    model = linear_model.LogisticRegression(random_state=randomSeed, fit_intercept=False).fit(inpD[["SeptBees","SeptMites"]],inpD["Survived"])
-    #coefficients are the log values of the ORs
-    oddsRatio = numpy.exp(model.coef_)/(1+numpy.exp(model.coef_))
+    ##Train model statsmodels 
+    #Use of default MLE method
+    model = sm.Logit(y,x).fit()
+    coeff = model.params.values
+    odds_ratio = numpy.exp(coeff)
+    print(model.wald_test_terms())
     
     ##Do a grid run with the model
     xmin = int(numpy.floor(inpD["SeptBees"].min()))
@@ -36,7 +42,7 @@ def modeler(inp):
     for x in range(xmin,xmax):
         for y in miteAxis:
             #numpy.asscalar to turn numpy float64 into native python float
-            hmD.loc[y,x] = model.predict_proba([[x,y]])[0][1]
+            hmD.loc[y,x] = model.predict([[x,y]])[0]
         #Inner elements are stored as objects; converted to numpy.float64
         hmD[x]=pandas.to_numeric(hmD[x])
         
@@ -49,6 +55,6 @@ def modeler(inp):
     plt.savefig("heatmap.png")
     plt.show()
     
-    return model, oddsRatio
+    return model, odds_ratio, pvalues, chi2
 
-model, oddsRatio = modeler(inpF)
+model, oddsRatio, pvalues, chi2 = modeler(inpF)
