@@ -9,7 +9,6 @@ import pandas
 import numpy
 import seaborn 
 import matplotlib.pyplot as plt
-from sklearn import linear_model
 import statsmodels.api as sm
 
 inputFile = inpF = "data/Nick file.txt"
@@ -18,7 +17,6 @@ def modeler(inp):
     ##Hyperparameters
     #proportion of data withheld to to test
     survivalshipThreshold = 6 #[Frames of bees]
-    randomSeed = 95
     
     ##Import and preprocess
     inputData = inpD = pandas.read_csv(inp, sep='\t', header = 0)
@@ -27,11 +25,12 @@ def modeler(inp):
     x = inpD[["SeptBees","SeptMites"]]
     y = inpD["Survived"]
     
-    ##Train model statsmodels 
+    ##Train model in statsmodels 
     #Use of default MLE method
     model = sm.Logit(y,x).fit()
     coeff = model.params.values
     odds_ratio = numpy.exp(coeff)
+    #Print out the corresponding Wald Chi^2 terms and p-value's
     print(model.wald_test_terms())
     
     ##Do a grid run with the model
