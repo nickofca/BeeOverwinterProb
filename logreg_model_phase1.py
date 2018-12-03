@@ -48,13 +48,13 @@ def modeler(inp):
         
     ##Create heat map
     fig, ax = plt.subplots(figsize=(15,15)) 
-    seaborn.heatmap(hmD.T,vmin=0,vmax=1,cbar_kws={"shrink": 0.35},linewidths = .6, square=True, ax=ax, annot=True)
+    seaborn.heatmap(hmD.T,vmin=0,vmax=1,cbar_kws={"shrink": 0.35},linewidths = .6, square=True, ax=ax, annot=True, annot_kws = {"fontsize":14}, cmap ="RdYlGn")
     plt.xlabel("Mites per 100 bees")
     plt.ylabel("Frames of Bees")
     plt.tight_layout()
     plt.savefig("heatmap.png")
     plt.show()
     
-    return model, odds_ratio, pvalues, chi2
+    return model, odds_ratio
 
-model, oddsRatio, pvalues, chi2 = modeler(inpF)
+model, oddsRatio = modeler(inpF)
